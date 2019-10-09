@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">JokeLibrary</string>
+    <string name="library_joke_button">Press Me</string>
+    <string name="toast_button_joke">Why did the elderly X cross the street? because he was vari-able</string>
+</resources>
