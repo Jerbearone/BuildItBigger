@@ -34,18 +34,18 @@ public class MainActivityFragment extends Fragment {
         jokeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EndpointsAsyncTask theTask = new EndpointsAsyncTask(root.getContext());
+                final String[] jokeString = new String[1];
+                EndpointsAsyncTask theTask = new EndpointsAsyncTask(root.getContext()) {
+                    @Override
+                    protected void onPostExecute(String result) {
+                        super.onPostExecute(result);
+                        jokeString[0] = result;
+                        Intent jokeToLibrary = new Intent(root.getContext(), JokeLibraryActivity.class);
+                        jokeToLibrary.putExtra("jokeString",jokeString[0]);
+                        root.getContext().startActivity(jokeToLibrary);
+                    }
+                };
                 theTask.execute();
-                try {
-                    String retrievedJokeString = theTask.get();
-                    Intent jokeToLibrary = new Intent(root.getContext(), JokeLibraryActivity.class);
-                    jokeToLibrary.putExtra("jokeString",retrievedJokeString);
-                    root.getContext().startActivity(jokeToLibrary);
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             }
         });
         return root;

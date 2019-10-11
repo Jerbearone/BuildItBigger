@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.android.jokelibrary.JokeLibraryActivity;
 import com.google.android.gms.ads.AdRequest;
@@ -14,8 +15,6 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
-
-import java.util.concurrent.ExecutionException;
 
 
 /**
@@ -44,18 +43,23 @@ public class MainActivityFragment extends Fragment {
         jokeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EndpointsAsyncTask theTask = new EndpointsAsyncTask(root.getContext());
+                final String[] jokeString = new String[1];
+                EndpointsAsyncTask theTask = new EndpointsAsyncTask(root.getContext()) {
+                    @Override
+                    protected void onPostExecute(String result) {
+                        super.onPostExecute(result);
+                        if (result != null) {
+                            jokeString[0] = result;
+                            Intent jokeToLibrary = new Intent(root.getContext(), JokeLibraryActivity.class);
+                            jokeToLibrary.putExtra("jokeString", jokeString[0]);
+                            root.getContext().startActivity(jokeToLibrary);
+                        }
+                        else {
+                            Toast.makeText(root.getContext(), "Backend connection error", Toast.LENGTH_LONG);
+                        }
+                    }
+                };
                 theTask.execute();
-                try {
-                    String retrievedJokeString = theTask.get();
-                    Intent jokeToLibrary = new Intent(root.getContext(), JokeLibraryActivity.class);
-                    jokeToLibrary.putExtra("jokeString",retrievedJokeString);
-                    root.getContext().startActivity(jokeToLibrary);
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             }
         });
 
